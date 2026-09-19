@@ -1,0 +1,47 @@
+{
+  "skill_name": "kie-ai-multimedia-orchestrator",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I want a 10-second cinematic trailer of a lone astronaut walking across a red desert at dusk, with epic orchestral background music. Use Kie AI. I don't have credits to burn so keep it reasonable. KIE_API_KEY is not set in this environment, so don't actually call the API - give me the full plan, model choices with reasoning, and the exact payloads/commands I'd run.",
+      "expected_output": "Sequential plan image->video->audio->ffmpeg merge, models chosen with rationale, createTask payloads with Bearer auth, async taskId+polling, fetches docs.kie.ai first.",
+      "files": [],
+      "assertions": [
+        "Plans stages in order image -> video -> audio -> merge",
+        "Fetches or cites docs.kie.ai for current models before choosing",
+        "Gives a rationale and runner-up for each chosen model",
+        "Uses POST /api/v1/jobs/createTask (or documented Direct API) with Bearer auth and no hardcoded key",
+        "Explains async: taskId returned first, then polling or callback",
+        "Feeds the image output URL into the video stage",
+        "Merges audio and video locally (ffmpeg) rather than claiming Kie does it",
+        "Notes cheaper draft tier or asks before costly runs"
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Make me a poster-style image of a coffee shop storefront with the sign reading 'Bean There' in clean lettering, 3:4 aspect ratio, via Kie AI. Dry run only (no API key here): show which model you'd pick and why, the payload, and how you'd get the result back.",
+      "expected_output": "Picks a text-capable model (Ideogram/GPT Image/Seedream) with rationale, verified against docs, correct payload, async handling, mentions fallback.",
+      "files": [],
+      "assertions": [
+        "Selects a text-rendering-capable model (Ideogram, GPT Image or Seedream) with rationale",
+        "Payload includes the exact sign text 'Bean There' and 3:4 aspect ratio in the model's own field names",
+        "Consults the model page rather than guessing parameters",
+        "Explains taskId + polling/callback retrieval and downloading results",
+        "Does not fabricate a generated result or taskId"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Using Kie AI, I need a 30-second narrated voiceover for a product demo (script: 'Meet Flowly, the calendar that plans itself.') and then an image-to-video clip from my logo at https://example.com/logo.png. Say the Veo model page shows it as degraded right now - what do you do? Dry run, no API key.",
+      "expected_output": "Chooses ElevenLabs/Gemini TTS, image-to-video with URL input, automatically falls back from Veo to next-best (Kling/Seedance) and says so, handles async, no fabricated results.",
+      "files": [],
+      "assertions": [
+        "Uses a TTS model (ElevenLabs or Gemini) for narration",
+        "Passes https://example.com/logo.png as the image-to-video input URL",
+        "Automatically falls back from degraded Veo to another video model (Kling/Seedance/Wan) and states it",
+        "Handles async taskId/polling for both tasks",
+        "Does not fabricate results or a taskId given no API key"
+      ]
+    }
+  ]
+}
