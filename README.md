@@ -1,14 +1,23 @@
 # Kie AI Multimedia Orchestrator
 
-A reusable **Claude Code skill** for orchestrating image, video, music, speech, and multi-step multimedia generation through the [Kie AI](https://kie.ai/) API.
+A reusable **Agent Skill** for orchestrating image, video, music, speech, and multi-step multimedia generation through the [Kie AI](https://kie.ai/) API.
 
-The skill is intentionally **model-agnostic and docs-driven**. Instead of baking in model IDs, endpoints, or payload schemas that can become stale, it instructs Claude Code to read the current Kie AI documentation, select an appropriate model for each modality, build the request, handle asynchronous task execution, download results, and fall back when a model is degraded or unavailable.
+The skill is intentionally **model-agnostic and docs-driven**. Instead of baking in model IDs, endpoints, or payload schemas that can become stale, it instructs the coding agent to read the current Kie AI documentation, select an appropriate model for each modality, build the request, handle asynchronous task execution, download results, and fall back when a model is degraded or unavailable.
 
-> This is a community project and is not affiliated with or endorsed by Anthropic or Kie AI.
+## Compatibility
+
+| Agent | Status |
+| --- | --- |
+| [Claude Code](https://code.claude.com/docs/) | ✅ Tested |
+| [OpenAI Codex](https://developers.openai.com/) | ✅ Tested |
+
+Both Claude Code and Codex support `SKILL.md`-based reusable skills with optional supporting scripts. The same skill contents are used; only the installation location and explicit invocation syntax differ.
+
+> This is a community project and is not affiliated with or endorsed by Anthropic, OpenAI, or Kie AI.
 
 ## What it does
 
-The skill can help Claude Code plan and execute workflows such as:
+The skill can help supported coding agents plan and execute workflows such as:
 
 - text-to-image and image editing
 - text-to-video and image-to-video
@@ -30,6 +39,7 @@ kie-ai-multimedia-orchestrator/
 │   └── evals.json
 ├── examples/
 │   └── README.md
+├── .env.example
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -37,17 +47,19 @@ kie-ai-multimedia-orchestrator/
 
 ## Requirements
 
-- [Claude Code](https://code.claude.com/docs/)
+- **Claude Code or OpenAI Codex**
 - Python 3
 - `curl`
 - a Kie AI account and API key
 - optional: `ffmpeg` for locally combining generated audio and video
 
-Claude Code must also be able to reach Kie AI's documentation and API endpoints.
+The coding agent must also be able to reach Kie AI's documentation and API endpoints.
 
 ## Install
 
-### Personal skill — macOS, Linux, or WSL
+### Claude Code — personal skill
+
+#### macOS, Linux, or WSL
 
 ```bash
 mkdir -p ~/.claude/skills
@@ -55,7 +67,7 @@ git clone https://github.com/cjgl23/kie-ai-multimedia-orchestrator.git \
   ~/.claude/skills/kie-ai-multimedia-orchestrator
 ```
 
-### Personal skill — Windows PowerShell
+#### Windows PowerShell
 
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
@@ -63,12 +75,38 @@ git clone https://github.com/cjgl23/kie-ai-multimedia-orchestrator.git `
   "$HOME\.claude\skills\kie-ai-multimedia-orchestrator"
 ```
 
-Claude Code discovers skills from the `skills/<name>/SKILL.md` structure. A personal installation under `~/.claude/skills/` makes the skill available across projects.
+Claude Code discovers personal skills under `~/.claude/skills/`.
 
-For a project-specific installation, place this repository under:
+For a project-specific Claude Code installation, place the repository under:
 
 ```text
 <your-project>/.claude/skills/kie-ai-multimedia-orchestrator/
+```
+
+### OpenAI Codex — personal skill
+
+Current Codex documentation uses `$HOME/.agents/skills` for user-level Agent Skills.
+
+#### macOS, Linux, or WSL
+
+```bash
+mkdir -p ~/.agents/skills
+git clone https://github.com/cjgl23/kie-ai-multimedia-orchestrator.git \
+  ~/.agents/skills/kie-ai-multimedia-orchestrator
+```
+
+#### Windows PowerShell
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME\.agents\skills" | Out-Null
+git clone https://github.com/cjgl23/kie-ai-multimedia-orchestrator.git `
+  "$HOME\.agents\skills\kie-ai-multimedia-orchestrator"
+```
+
+For a repository-specific Codex installation, place the repository under:
+
+```text
+<your-project>/.agents/skills/kie-ai-multimedia-orchestrator/
 ```
 
 ## Configure your Kie AI API key
@@ -91,23 +129,39 @@ The included helper reads `KIE_API_KEY` from the environment. It does not contai
 
 ## Use it
 
-Start Claude Code normally:
-
-```bash
-claude
-```
-
-Then describe the media outcome you want. For example:
+Describe the media outcome you want. For example:
 
 ```text
 Create a cinematic 10-second trailer of a lone astronaut crossing a red desert
 at dusk, with epic orchestral music. Use Kie AI and keep the cost reasonable.
 ```
 
+### Claude Code
+
+Start Claude Code normally:
+
+```bash
+claude
+```
+
 Claude Code can select the skill automatically from its description. You can also invoke it explicitly:
 
 ```text
 /kie-ai-multimedia-orchestrator
+```
+
+### OpenAI Codex
+
+Start Codex normally:
+
+```bash
+codex
+```
+
+Codex can select an installed skill automatically when the request matches its description. You can also explicitly reference the skill:
+
+```text
+$kie-ai-multimedia-orchestrator
 ```
 
 More prompts are available in [examples/README.md](examples/README.md).
@@ -128,7 +182,7 @@ The skill deliberately avoids hardcoding Kie AI model IDs or API schemas in `SKI
 
 ## Helper script
 
-`scripts/kie_client.py` is a small generic task runner used after Claude Code has discovered the current endpoint and response fields from the Kie AI docs.
+`scripts/kie_client.py` is a small generic task runner used after the coding agent has discovered the current endpoint and response fields from the Kie AI docs.
 
 It can:
 
@@ -153,14 +207,14 @@ The placeholders are intentional. Use the values from the **current model docume
 
 ## Cost and privacy
 
-Generation can consume Kie AI credits, especially video generation. The skill instructs Claude Code to:
+Generation can consume Kie AI credits, especially video generation. The skill instructs the coding agent to:
 
 - prefer lower-cost drafts when appropriate
 - inspect credit usage where supported
 - ask before obviously expensive multi-video or high-resolution runs
 - avoid blindly resubmitting an asynchronous task after a timeout
 
-Some workflows require uploading a local file so Kie AI can access it by URL. The skill tells Claude Code to check Kie AI's current upload documentation before doing so and to explain temporary storage/retention implications to the user.
+Some workflows require uploading a local file so Kie AI can access it by URL. The skill tells the coding agent to check Kie AI's current upload documentation before doing so and to explain temporary storage/retention implications to the user.
 
 Generated assets and temporary download URLs should be saved promptly because retention and URL lifetime are service-controlled and may change.
 
@@ -187,11 +241,17 @@ These evals are development aids rather than guarantees that every third-party m
 
 ## Updating
 
-Because this is installed with Git, updating is straightforward:
+If you installed the skill with Git, update it from its installation directory:
 
 ```bash
-cd ~/.claude/skills/kie-ai-multimedia-orchestrator
 git pull
+```
+
+Typical locations are:
+
+```text
+Claude Code: ~/.claude/skills/kie-ai-multimedia-orchestrator
+Codex:       ~/.agents/skills/kie-ai-multimedia-orchestrator
 ```
 
 ## License
@@ -201,5 +261,6 @@ MIT License. See [LICENSE](LICENSE).
 ## References
 
 - Claude Code documentation: https://code.claude.com/docs/
+- OpenAI Codex / Agent Skills documentation: https://developers.openai.com/docs/customization/overview
 - Kie AI documentation: https://docs.kie.ai/
 - Kie AI model market: https://kie.ai/market
