@@ -28,6 +28,14 @@ The skill can help supported coding agents plan and execute workflows such as:
 
 It is designed around Kie AI's live documentation, because available models, API parameters, pricing, limits, and endpoints can change over time.
 
+## Demo
+
+Here is an example of what the skill can create by orchestrating a multimedia workflow through Kie AI:
+
+[![Gloop Explores the Neighborhood!](https://img.youtube.com/vi/zSE_K5RrOMg/maxresdefault.jpg)](https://youtu.be/zSE_K5RrOMg)
+
+▶️ **[Watch: Gloop Explores the Neighborhood!](https://youtu.be/zSE_K5RrOMg)**
+
 ## Repository structure
 
 ```text
