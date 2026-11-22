@@ -17,7 +17,7 @@ Identify the modalities needed and how they depend on each other:
 - **Video**: text-to-video, image-to-video, extend, upscale, lip sync/avatar
 - **Audio**: music, speech (TTS), sound effects, stem/vocal separation
 
-Write a short plan before spending credits, e.g.:
+Draft a short plan in dependency order, then add the model choices and cost estimates from Steps 3 and 4 before sharing it and spending credits. For example:
 
 ```
 1. image  (text-to-image)  -> keyframe.png
@@ -34,7 +34,7 @@ If the request is ambiguous in a way that changes cost or output (duration, aspe
 
 Do not rely on memory or on this file for endpoints, model IDs, parameter names, response shapes or status values. Kie changes them often (models get new versions, whole model families move from a dedicated API to the unified Market API), and a wrong guess wastes credits. Discover them each time:
 
-1. Fetch `https://docs.kie.ai/llms.txt` (the docs index). It lists every model family and API page, grouped by image / video / music-audio / common. Use `https://docs.kie.ai/` and `https://kie.ai/market` for overviews, pricing and tiers.
+1. Fetch `https://docs.kie.ai/llms.txt` (the docs index). It lists every model family and API page, grouped by image / video / music-audio / common. Use `https://docs.kie.ai/` and `https://kie.ai/market` for overviews and model tiers.
 2. Open the page for the model you intend to use, and read from it: the create-task endpoint and method, the exact model ID, every input field with allowed values and limits (durations, aspect ratios, resolutions, whether a callback URL is required), the endpoint and response fields for checking status, and how results are returned.
 3. Read the general pages for the account-level facts: base URL, authentication, the async task model, rate limits, webhook verification, file-upload and credits endpoints. Look for them in the index rather than assuming them.
 4. Note any deprecation, "old version", or degraded/offline banner on the page; it feeds the fallback logic.
@@ -61,7 +61,9 @@ Check inputs against the request before spending: does the requested duration ma
 
 **Uploading user files.** Models take URLs, so a local file (photo, audio, video, document, anything the user supplies) has to be uploaded to Kie first. Before uploading, tell the user in one or two lines: the file will be sent to Kie's temporary storage, the link is reachable by anyone who has it until it expires, and the docs describe automatic expiry only, with no delete endpoint (re-check the upload pages in case that has changed). Proceed once the user has clearly asked for the task that needs the file; if they seem unaware or the file looks sensitive (IDs, private documents, other people's images), ask first. Prefer a URL the user already hosts publicly over uploading. Record the `expiresAt`/retention information returned by the upload, delete any temporary local copies you made (such as base64 dumps), and mention what remains stored, including the generated outputs, in your final summary.
 
-**Cost.** Docs and model pages usually don't publish prices. Read the account balance (the credits endpoint on the docs' common pages) before and after each generation and report the real cost, and use minimal durations/resolutions/tiers for tests and drafts.
+**Cost.** Check the selected model's Kie Market page for pricing and billing details. Use [Kie's pricing table](https://kie.ai/pricing) for missing rates and to verify current prices. Match the exact model tier and settings, then multiply by the billable units (such as generations, characters, or seconds, including input duration where billed). Show estimated credits per paid stage and for the full plan before submitting any generation, with pricing links and assumptions. If an exact estimate is unavailable, give a supported range or mark the stage's cost as unknown and label any subtotal as partial. Update the estimate before submitting a fallback or changing billable settings.
+
+Read the account balance (via the credits endpoint in the docs' common pages) before and after each generation and report measured usage. If concurrent activity prevents attribution, report the combined observed change and identify it as such. Use minimal durations, resolutions and tiers for tests and drafts.
 
 `scripts/kie_client.py` is a generic helper that creates a task, polls it and downloads results. It has no built-in endpoints; you pass the ones you discovered (`--help`). Write the request JSON to a file and pass `--body-file` (inline `--body` breaks on Windows shells); invoke Python as `python3` on macOS/Linux or `python`/`py` on Windows. It makes its HTTP calls with `curl` so corporate TLS-inspecting proxies (whose CA lives in the OS trust store) work; don't work around certificate errors by disabling verification.
 
