@@ -47,7 +47,13 @@ The docs are not always self-consistent (an endpoint page can name a different h
 
 ## Step 3 - Select a model per modality
 
-Choose from what the docs list *today*, based on the user's actual constraint: readable text in an image, character consistency, motion control, cinematic realism, native audio, speed and cost, duration limits, resolution. Compare the candidates' pages rather than reputation. Explain the choice in 2-4 lines (model, why, runner-up).
+First classify the shot in one line: cinematic realism / stylized 2D or painted / motion graphics or typography / heavy physical action / multi-scene project / still image. The type narrows the candidates before you compare pages.
+
+Choose from what the docs list *today*, based on the user's actual constraint: readable text in an image, character consistency, motion control, cinematic realism, native audio, speed and cost, duration limits, resolution. Compare the candidates' pages rather than reputation. For each modality, name a QUALITY pick, a BUDGET pick and one runner-up, with the cheaper option's trade-off in plain words (model, why, what you give up).
+
+Never recommend the most expensive model by default; the expensive model needs a reason (acting close-ups, multi-shot consistency, a final hero shot).
+
+For fights, stunts or dance, text-only prompts burn credits on messy body motion. Check the live docs for a motion-transfer or motion-control model first and price it against the reruns.
 
 Prefer a cheaper tier for drafts when the user hasn't asked for final quality, and say so. Video is usually the expensive step, so get the keyframe right first.
 
@@ -64,6 +70,8 @@ Check inputs against the request before spending: does the requested duration ma
 **Cost.** Check the selected model's Kie Market page for pricing and billing details. Use [Kie's pricing table](https://kie.ai/pricing) for missing rates and to verify current prices. Match the exact model tier and settings, then multiply by the billable units (such as generations, characters, or seconds, including input duration where billed). Show estimated credits per paid stage and for the full plan before submitting any generation, with pricing links and assumptions. If an exact estimate is unavailable, give a supported range or mark the stage's cost as unknown and label any subtotal as partial. Update the estimate before submitting a fallback or changing billable settings.
 
 Read the account balance (via the credits endpoint in the docs' common pages) before and after each generation and report measured usage. If concurrent activity prevents attribution, report the combined observed change and identify it as such. Use minimal durations, resolutions and tiers for tests and drafts.
+
+Keep a local cost log: after each job, append the measured real cost (model, duration, resolution, credits or USD from the balance delta) to `cost-log.md` next to this skill, and consult it when estimating the next job. Treat published per-second figures from creators and third parties as unverified claims until the log confirms them.
 
 `scripts/kie_client.py` is a generic helper that creates a task, polls it and downloads results. It has no built-in endpoints; you pass the ones you discovered (`--help`). Write the request JSON to a file and pass `--body-file` (inline `--body` breaks on Windows shells); invoke Python as `python3` on macOS/Linux or `python`/`py` on Windows. It makes its HTTP calls with `curl` so corporate TLS-inspecting proxies (whose CA lives in the OS trust store) work; don't work around certificate errors by disabling verification.
 
